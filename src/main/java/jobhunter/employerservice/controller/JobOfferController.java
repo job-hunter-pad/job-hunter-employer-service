@@ -23,12 +23,13 @@ public class JobOfferController {
 
     @GetMapping("/{jobId}")
     public JobOffer getJobOffer(@PathVariable String jobId) {
-        Optional<JobOffer> jobOffer = jobOfferRepository.findById(jobId);
+        return jobOfferRepository.findById(jobId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
 
-        if (jobOffer.isPresent()) {
-            return jobOffer.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    @GetMapping("/getEmployerJobOffers/{employerId}")
+    public List<JobOffer> getJobOffersByEmployer(@PathVariable String employerId) {
+        return jobOfferRepository.findAllByEmployerId(employerId);
     }
 
     @PostMapping("/create")
