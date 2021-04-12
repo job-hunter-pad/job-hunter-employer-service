@@ -1,6 +1,5 @@
 package jobhunter.employerservice.model;
 
-import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -34,14 +33,5 @@ public class JobOffer {
         paid = false;
         done = false;
         applications = new ArrayList<>();
-    }
-
-    public JobOffer(CreateJobOfferDTO jobOfferDTO) {
-        this(jobOfferDTO.getJobName(),
-                jobOfferDTO.getJobDescription(),
-                jobOfferDTO.getDate(),
-                jobOfferDTO.getEmployerId(),
-                jobOfferDTO.getEmployerName(),
-                jobOfferDTO.getHourSalaryAmount());
     }
 }
