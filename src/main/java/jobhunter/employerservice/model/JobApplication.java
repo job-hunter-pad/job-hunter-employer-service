@@ -8,6 +8,7 @@ public class JobApplication {
     @Id
     private String id;
 
+    private String jobId;
     private String freelancerId;
     private String freelancerName;
     private float hourSalaryAmount;
