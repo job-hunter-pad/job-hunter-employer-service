@@ -2,6 +2,8 @@ package jobhunter.employerservice.controller;
 
 import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
 import jobhunter.employerservice.controller.dto.UpdateJobOfferDTO;
+import jobhunter.employerservice.model.JobApplication;
+import jobhunter.employerservice.model.JobApplicationStatus;
 import jobhunter.employerservice.model.JobOffer;
 import jobhunter.employerservice.repository.JobOfferRepository;
 import jobhunter.employerservice.utils.StringValidation;
@@ -76,4 +78,37 @@ public class JobOfferController {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
+
+    @GetMapping("/getJobApplications/{jobId}")
+    public List<JobApplication> getJobApplications(@PathVariable String jobId) {
+        JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return jobOffer.getApplications();
+    }
+
+    @PostMapping("/acceptApplication/{jobId}/{applicationId}")
+    public void acceptApplication(@PathVariable String jobId, @PathVariable String applicationId) {
+        JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Optional<JobApplication> jobApplication = jobOffer.getApplications()
+                .stream()
+                .filter(application -> application.getId().equals(applicationId))
+                .findFirst();
+
+        if (jobApplication.isPresent()) {
+            jobApplication.get().setStatus(JobApplicationStatus.ACCEPTED);
+        }
+    }
+
+    @PostMapping("/rejectApplication/{jobId}/{applicationId}")
+    public void rejectApplication(@PathVariable String jobId, @PathVariable String applicationId) {
+        JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Optional<JobApplication> jobApplication = jobOffer.getApplications()
+                .stream()
+                .filter(application -> application.getId().equals(applicationId))
+                .findFirst();
+
+        if (jobApplication.isPresent()) {
+            jobApplication.get().setStatus(JobApplicationStatus.REJECTED);
+        }
+    }
+
 }
