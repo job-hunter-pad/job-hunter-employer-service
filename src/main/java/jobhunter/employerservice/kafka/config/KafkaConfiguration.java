@@ -1,7 +1,7 @@
 package jobhunter.employerservice.kafka.config;
 
-import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
 import jobhunter.employerservice.model.JobApplication;
+import jobhunter.employerservice.model.JobOffer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -42,7 +42,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public ProducerFactory<String, CreateJobOfferDTO> jobOfferProducerFactory() {
+    public ProducerFactory<String, JobOffer> jobOfferProducerFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
@@ -53,7 +53,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public KafkaTemplate<String, CreateJobOfferDTO> kafkaTemplate() {
+    public KafkaTemplate<String, JobOffer> kafkaTemplate() {
         return new KafkaTemplate<>(jobOfferProducerFactory());
     }
 }

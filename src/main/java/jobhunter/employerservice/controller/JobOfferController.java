@@ -46,8 +46,10 @@ public class JobOfferController {
         if (jobOfferDTO == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        jobOfferProducer.postJobOffer(jobOfferDTO);
-        return jobOfferRepository.save(jobOfferDTO.createJobOffer());
+
+        JobOffer jobOffer = jobOfferRepository.save(jobOfferDTO.createJobOffer());
+        jobOfferProducer.postJobOffer(jobOffer);
+        return jobOffer;
     }
 
     @PostMapping("/update")
