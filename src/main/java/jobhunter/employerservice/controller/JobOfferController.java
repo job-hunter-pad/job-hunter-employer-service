@@ -2,12 +2,12 @@ package jobhunter.employerservice.controller;
 
 import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
 import jobhunter.employerservice.controller.dto.UpdateJobOfferDTO;
+import jobhunter.employerservice.kafka.producer.JobOfferProducer;
 import jobhunter.employerservice.model.JobApplication;
 import jobhunter.employerservice.model.JobApplicationStatus;
 import jobhunter.employerservice.model.JobOffer;
 import jobhunter.employerservice.repository.JobOfferRepository;
 import jobhunter.employerservice.utils.StringValidation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,8 +17,13 @@ import java.util.Optional;
 
 @RestController
 public class JobOfferController {
-    @Autowired
-    private JobOfferRepository jobOfferRepository;
+    private final JobOfferRepository jobOfferRepository;
+    private final JobOfferProducer jobOfferProducer;
+
+    public JobOfferController(JobOfferRepository jobOfferRepository, JobOfferProducer jobOfferProducer) {
+        this.jobOfferRepository = jobOfferRepository;
+        this.jobOfferProducer = jobOfferProducer;
+    }
 
     @GetMapping("/")
     public List<JobOffer> getAllJobOffers() {
@@ -41,6 +46,7 @@ public class JobOfferController {
         if (jobOfferDTO == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        jobOfferProducer.postJobOffer(jobOfferDTO);
         return jobOfferRepository.save(jobOfferDTO.createJobOffer());
     }
 
