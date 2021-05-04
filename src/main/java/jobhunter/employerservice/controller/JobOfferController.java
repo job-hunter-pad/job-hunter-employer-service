@@ -46,9 +46,10 @@ public class JobOfferController {
         if (jobOfferDTO == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-
         JobOffer jobOffer = jobOfferRepository.save(jobOfferDTO.createJobOffer());
+
         jobOfferProducer.postJobOffer(jobOffer);
+
         return jobOffer;
     }
 
@@ -82,7 +83,11 @@ public class JobOfferController {
                 jobOffer.setDone(jobOfferDTO.isDone());
             }
 
-            return jobOfferRepository.save(jobOffer);
+            JobOffer updatedJobOffer = jobOfferRepository.save(jobOffer);
+
+            jobOfferProducer.postJobOffer(updatedJobOffer);
+
+            return updatedJobOffer;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
