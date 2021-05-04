@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class JobOfferController {
@@ -37,9 +38,17 @@ public class JobOfferController {
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/getEmployerJobOffers/{employerId}")
+    @GetMapping("/getJobOffers/{employerId}")
     public List<JobOffer> getJobOffersByEmployer(@PathVariable String employerId) {
         return jobOfferRepository.findAllByEmployerId(employerId);
+    }
+
+
+    @GetMapping("/getNotCompletedJobOffers/{employerId}")
+    public List<JobOffer> getEmployerNotCompletedJobOffers(@PathVariable String employerId) {
+        return jobOfferRepository.findAllByEmployerId(employerId).stream()
+                .filter(jobOffer -> jobOffer.getStatus() != JobOfferStatus.COMPLETED)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/create")
@@ -127,5 +136,4 @@ public class JobOfferController {
 
         jobApplication.ifPresent(application -> application.setStatus(JobApplicationStatus.REJECTED));
     }
-
 }

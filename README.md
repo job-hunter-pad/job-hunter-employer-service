@@ -6,7 +6,8 @@
 | ------ | ------ | ------ | ------ |
 | / | /api/jobs | GET | Get All Job Offers |
 | /{jobId} | /api/jobs/{jobId} | GET | Get the Job Offer by Id |
-| /getEmployerJobOffers/{employerId} | /api/jobs/getEmployerJobOffers/{employerId} | GET | Get all Job Offers made by the Employer with the id of "employerId" |
+| /getJobOffers/{employerId} | /api/jobs/getJobOffers/{employerId} | GET | Get all Job Offers made by the Employer with the id of "employerId" |
+| /getNotCompletedJobOffers/{employerId} | /api/jobs/getNotCompletedJobOffers/{employerId} | GET | Get all Job Offers with status not COMPLETED made by the Employer with the id of "employerId" |
 | /create | /api/jobs/create | POST | Create a new Job Offer |
 | /update | /api/jobs/update | POST | Update a Job Offer |
 | /getJobApplications/{jobId} | /api/jobs/getJobApplications/{jobId} | GET | Get All the Job Applications of the Job Offer with the id of "jobId" |
