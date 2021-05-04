@@ -6,6 +6,7 @@ import jobhunter.employerservice.kafka.producer.JobOfferProducer;
 import jobhunter.employerservice.model.JobApplication;
 import jobhunter.employerservice.model.JobApplicationStatus;
 import jobhunter.employerservice.model.JobOffer;
+import jobhunter.employerservice.model.JobOfferStatus;
 import jobhunter.employerservice.repository.JobOfferRepository;
 import jobhunter.employerservice.utils.StringValidation;
 import org.springframework.http.HttpStatus;
@@ -75,14 +76,6 @@ public class JobOfferController {
                 jobOffer.setHourSalaryAmount(jobOfferDTO.getHourSalaryAmount());
             }
 
-            if (!jobOffer.isPaid()) {
-                jobOffer.setPaid(jobOfferDTO.isPaid());
-            }
-
-            if (!jobOffer.isDone()) {
-                jobOffer.setDone(jobOfferDTO.isDone());
-            }
-
             JobOffer updatedJobOffer = jobOfferRepository.save(jobOffer);
 
             jobOfferProducer.postJobOffer(updatedJobOffer);
@@ -101,14 +94,27 @@ public class JobOfferController {
     @PostMapping("/acceptApplication/{jobId}/{applicationId}")
     public void acceptApplication(@PathVariable String jobId, @PathVariable String applicationId) {
         JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Optional<JobApplication> jobApplication = jobOffer.getApplications()
+        Optional<JobApplication> jobApplicationOptional = jobOffer.getApplications()
                 .stream()
                 .filter(application -> application.getId().equals(applicationId))
                 .findFirst();
 
-        if (jobApplication.isPresent()) {
-            jobApplication.get().setStatus(JobApplicationStatus.ACCEPTED);
+        jobOffer.setStatus(JobOfferStatus.IN_PROGRESS);
+
+        if (jobApplicationOptional.isPresent()) {
+            JobApplication jobApplication = jobApplicationOptional.get();
+
+            jobApplication.setStatus(JobApplicationStatus.ACCEPTED);
+
+            for (JobApplication application : jobOffer.getApplications()) {
+                if (application.getId().equals(jobApplication.getId())) {
+                    continue;
+                }
+                application.setStatus(JobApplicationStatus.REJECTED);
+            }
         }
+
+        jobOfferRepository.save(jobOffer);
     }
 
     @PostMapping("/rejectApplication/{jobId}/{applicationId}")
@@ -119,9 +125,7 @@ public class JobOfferController {
                 .filter(application -> application.getId().equals(applicationId))
                 .findFirst();
 
-        if (jobApplication.isPresent()) {
-            jobApplication.get().setStatus(JobApplicationStatus.REJECTED);
-        }
+        jobApplication.ifPresent(application -> application.setStatus(JobApplicationStatus.REJECTED));
     }
 
 }

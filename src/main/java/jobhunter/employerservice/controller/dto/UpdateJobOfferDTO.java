@@ -10,6 +10,4 @@ public class UpdateJobOfferDTO {
     String jobName;
     String jobDescription;
     Float hourSalaryAmount;
-    boolean paid;
-    boolean done;
 }

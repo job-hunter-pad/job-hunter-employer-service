@@ -19,8 +19,7 @@ public class JobOffer {
     private String employerId;
     private String employerName;
     private float hourSalaryAmount;
-    private boolean paid;
-    private boolean done;
+    private JobOfferStatus status;
     private List<JobApplication> applications;
 
     public JobOffer(String jobName, String jobDescription, String date, String employerId, String employerName, float hourSalaryAmount) {
@@ -30,8 +29,7 @@ public class JobOffer {
         this.employerId = employerId;
         this.employerName = employerName;
         this.hourSalaryAmount = hourSalaryAmount;
-        paid = false;
-        done = false;
+        status = JobOfferStatus.PENDING;
         applications = new ArrayList<>();
     }
 }

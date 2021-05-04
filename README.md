@@ -26,8 +26,7 @@
   "employerId": "",
   "employerName": "",
   "hourSalaryAmount": 0.0,
-  "paid": false,
-  "done": false,
+  "status": "",
   "applications": []
 }
 ```
@@ -67,9 +66,7 @@
   "id": "",
   "jobName": "",
   "jobDescription": "",
-  "hourSalaryAmount": 0.0,
-  "paid": false,
-  "done": false
+  "hourSalaryAmount": 0.0
 }
 ```
 
