@@ -43,11 +43,7 @@ public class KafkaConfiguration {
 
     @Bean
     public ProducerFactory<String, JobOffer> jobOfferProducerFactory() {
-        Map<String, Object> config = new HashMap<>();
-
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        Map<String, Object> config = getProducerConfig();
 
         return new DefaultKafkaProducerFactory<>(config);
     }
@@ -55,5 +51,26 @@ public class KafkaConfiguration {
     @Bean
     public KafkaTemplate<String, JobOffer> kafkaTemplate() {
         return new KafkaTemplate<>(jobOfferProducerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, JobApplication> jobApplicationProducerFactory() {
+        Map<String, Object> config = getProducerConfig();
+
+        return new DefaultKafkaProducerFactory<>(config);
+    }
+
+    @Bean
+    public KafkaTemplate<String, JobApplication> jobApplicationsKafkaTemplate() {
+        return new KafkaTemplate<>(jobApplicationProducerFactory());
+    }
+
+    private Map<String, Object> getProducerConfig() {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return config;
     }
 }
