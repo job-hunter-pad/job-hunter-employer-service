@@ -19,16 +19,18 @@ public class JobOffer {
     private String employerId;
     private String employerName;
     private float hourSalaryAmount;
+    private List<String> skills;
     private JobOfferStatus status;
     private List<JobApplication> applications;
 
-    public JobOffer(String jobName, String jobDescription, String date, String employerId, String employerName, float hourSalaryAmount) {
+    public JobOffer(String jobName, String jobDescription, String date, String employerId, String employerName, float hourSalaryAmount, List<String> skills) {
         this.jobName = jobName;
         this.jobDescription = jobDescription;
         this.date = date;
         this.employerId = employerId;
         this.employerName = employerName;
         this.hourSalaryAmount = hourSalaryAmount;
+        this.skills = skills;
         status = JobOfferStatus.PENDING;
         applications = new ArrayList<>();
     }

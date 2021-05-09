@@ -31,6 +31,7 @@
   "employerName": "",
   "hourSalaryAmount": 0.0,
   "status": "",
+  "skills": [],
   "applications": []
 }
 ```
@@ -80,7 +81,8 @@ public enum JobApplicationStatus {
   "date": "",
   "employerId": "",
   "employerName": "",
-  "hourSalaryAmount": 0.0
+  "hourSalaryAmount": 0.0,
+  "skills": []
 }
 ```
 
@@ -91,7 +93,8 @@ public enum JobApplicationStatus {
   "id": "",
   "jobName": "",
   "jobDescription": "",
-  "hourSalaryAmount": 0.0
+  "hourSalaryAmount": 0.0,
+  "skills": []
 }
 ```
 

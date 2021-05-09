@@ -4,6 +4,8 @@ import jobhunter.employerservice.model.JobOffer;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Value
 public class CreateJobOfferDTO {
@@ -13,6 +15,7 @@ public class CreateJobOfferDTO {
     String employerId;
     String employerName;
     float hourSalaryAmount;
+    List<String> skills;
 
     public JobOffer createJobOffer() {
         return new JobOffer(
@@ -21,6 +24,7 @@ public class CreateJobOfferDTO {
                 getDate(),
                 getEmployerId(),
                 getEmployerName(),
-                getHourSalaryAmount());
+                getHourSalaryAmount(),
+                skills);
     }
 }

@@ -127,6 +127,10 @@ public class JobOfferServiceImpl implements JobOfferService {
             jobOffer.setHourSalaryAmount(jobOfferDTO.getHourSalaryAmount());
         }
 
+        if (jobOfferDTO.getSkills() != null) {
+            jobOffer.setSkills(jobOfferDTO.getSkills());
+        }
+
         return Optional.of(jobOfferRepository.save(jobOffer));
     }
 }
