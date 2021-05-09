@@ -14,6 +14,7 @@
 | /getJobApplications/{jobId} | /api/jobs/getJobApplications/{jobId} | GET | Get All the Job Applications of the Job Offer with the id of "jobId" |
 | /acceptApplication/{jobId}/{applicationId} | /api/jobs/acceptApplication/{jobId}/{applicationId} | POST | Application Status Will be changed to "ACCEPTED" for the Application with the id "applicationId" for the Job Offer with the id "jobId" |
 | /rejectApplication/{jobId}/{applicationId} | /api/jobs/rejectApplication/{jobId}/{applicationId} | POST | Application Status Will be changed to "REJECTED" for the Application with the id "applicationId" for the Job Offer with the id "jobId" |
+| /completeJob/{jobId} | /api/jobs/completeJob/{jobId} | POST | Complete A Job Offer |
 
 ## Mappings Request And Responses
 
