@@ -1,5 +1,7 @@
 package jobhunter.employerservice.service;
 
+import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
+import jobhunter.employerservice.controller.dto.UpdateJobOfferDTO;
 import jobhunter.employerservice.model.JobApplication;
 import jobhunter.employerservice.model.JobOffer;
 
@@ -16,4 +18,14 @@ public interface JobOfferService {
     List<JobOffer> getAllCompletedJobOffersOfEmployer(String employerId);
 
     List<JobOffer> getAllNotCompletedJobOffersOfEmployer(String employerId);
+
+    List<JobOffer> getAllJobOffers();
+
+    Optional<JobOffer> getJobOffer(String jobId);
+
+    List<JobOffer> getJobOfferByEmployer(String employerId);
+
+    JobOffer createJob(CreateJobOfferDTO jobOfferDTO);
+
+    Optional<JobOffer> updateJobOffer(UpdateJobOfferDTO jobOfferDTO);
 }

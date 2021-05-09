@@ -38,18 +38,18 @@ public class JobOfferController {
 
     @GetMapping("/")
     public List<JobOffer> getAllJobOffers() {
-        return jobOfferRepository.findAll();
+        return jobOfferService.getAllJobOffers();
     }
 
     @GetMapping("/{jobId}")
     public JobOffer getJobOffer(@PathVariable String jobId) {
-        return jobOfferRepository.findById(jobId).orElseThrow(() ->
+        return jobOfferService.getJobOffer(jobId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getJobOffers/{employerId}")
     public List<JobOffer> getJobOffersByEmployer(@PathVariable String employerId) {
-        return jobOfferRepository.findAllByEmployerId(employerId);
+        return jobOfferService.getJobOfferByEmployer(employerId);
     }
 
 
@@ -68,7 +68,7 @@ public class JobOfferController {
         if (jobOfferDTO == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        JobOffer jobOffer = jobOfferRepository.save(jobOfferDTO.createJobOffer());
+        JobOffer jobOffer = jobOfferService.createJob(jobOfferDTO);
 
         jobOfferProducer.postJobOffer(jobOffer);
 
@@ -81,40 +81,31 @@ public class JobOfferController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Optional<JobOffer> jobOfferOptional = jobOfferRepository.findById(jobOfferDTO.getId());
-        if (jobOfferOptional.isPresent()) {
-            JobOffer jobOffer = jobOfferOptional.get();
 
-            if (StringValidation.IsStringNotEmpty(jobOfferDTO.getJobName())) {
-                jobOffer.setJobName(jobOfferDTO.getJobName());
-            }
-
-            if (StringValidation.IsStringNotEmpty(jobOfferDTO.getJobDescription())) {
-                jobOffer.setJobDescription(jobOfferDTO.getJobDescription());
-            }
-
-            if (jobOfferDTO.getHourSalaryAmount() != null) {
-                jobOffer.setHourSalaryAmount(jobOfferDTO.getHourSalaryAmount());
-            }
-
-            JobOffer updatedJobOffer = jobOfferRepository.save(jobOffer);
-
-            jobOfferProducer.postJobOffer(updatedJobOffer);
-
-            return updatedJobOffer;
+        Optional<JobOffer> jobOfferOptional = jobOfferService.updateJobOffer(jobOfferDTO);
+        if (jobOfferOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        JobOffer jobOffer1 = jobOfferOptional.get();
+        jobOfferProducer.postJobOffer(jobOffer1);
+
+        return jobOffer1;
     }
 
     @GetMapping("/getJobApplications/{jobId}")
     public List<JobApplication> getJobApplications(@PathVariable String jobId) {
-        JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return jobOffer.getApplications();
+        Optional<JobOffer> jobOfferOptional = jobOfferService.getJobOffer(jobId);
+        if (jobOfferOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return jobOfferOptional.get().getApplications();
     }
 
     @PostMapping("/acceptApplication/{jobId}/{applicationId}")
     public JobApplication acceptApplication(@PathVariable String jobId, @PathVariable String applicationId) {
         JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         Optional<JobApplication> jobApplicationOptional = jobOffer.getApplications()
                 .stream()
                 .filter(application -> application.getId().equals(applicationId))

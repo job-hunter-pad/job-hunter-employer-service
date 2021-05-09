@@ -1,10 +1,13 @@
 package jobhunter.employerservice.service;
 
+import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
+import jobhunter.employerservice.controller.dto.UpdateJobOfferDTO;
 import jobhunter.employerservice.model.JobApplication;
 import jobhunter.employerservice.model.JobApplicationStatus;
 import jobhunter.employerservice.model.JobOffer;
 import jobhunter.employerservice.model.JobOfferStatus;
 import jobhunter.employerservice.repository.JobOfferRepository;
+import jobhunter.employerservice.utils.StringValidation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -81,5 +84,49 @@ public class JobOfferServiceImpl implements JobOfferService {
         return jobOfferRepository.findAllByEmployerId(employerId).stream()
                 .filter(jobOffer -> jobOffer.getStatus() != JobOfferStatus.COMPLETED)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<JobOffer> getAllJobOffers() {
+        return jobOfferRepository.findAll();
+    }
+
+    @Override
+    public Optional<JobOffer> getJobOffer(String jobId) {
+        return jobOfferRepository.findById(jobId);
+    }
+
+    @Override
+    public List<JobOffer> getJobOfferByEmployer(String employerId) {
+        return jobOfferRepository.findAllByEmployerId(employerId);
+    }
+
+    @Override
+    public JobOffer createJob(CreateJobOfferDTO jobOfferDTO) {
+        return jobOfferRepository.save(jobOfferDTO.createJobOffer());
+    }
+
+    @Override
+    public Optional<JobOffer> updateJobOffer(UpdateJobOfferDTO jobOfferDTO) {
+        Optional<JobOffer> jobOfferOptional = jobOfferRepository.findById(jobOfferDTO.getId());
+        if (jobOfferOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        JobOffer jobOffer = jobOfferOptional.get();
+
+        if (StringValidation.IsStringNotEmpty(jobOfferDTO.getJobName())) {
+            jobOffer.setJobName(jobOfferDTO.getJobName());
+        }
+
+        if (StringValidation.IsStringNotEmpty(jobOfferDTO.getJobDescription())) {
+            jobOffer.setJobDescription(jobOfferDTO.getJobDescription());
+        }
+
+        if (jobOfferDTO.getHourSalaryAmount() != null) {
+            jobOffer.setHourSalaryAmount(jobOfferDTO.getHourSalaryAmount());
+        }
+
+        return Optional.of(jobOfferRepository.save(jobOffer));
     }
 }
