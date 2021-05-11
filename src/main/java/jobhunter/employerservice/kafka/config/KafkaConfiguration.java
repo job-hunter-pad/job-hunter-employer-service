@@ -2,6 +2,7 @@ package jobhunter.employerservice.kafka.config;
 
 import jobhunter.employerservice.model.JobApplication;
 import jobhunter.employerservice.model.JobOffer;
+import jobhunter.employerservice.model.payment.JobOfferPayment;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -23,12 +24,7 @@ public class KafkaConfiguration {
 
     @Bean
     public ConsumerFactory<String, JobApplication> consumerFactory() {
-        Map<String, Object> config = new HashMap<>();
-
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_job_application");
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        Map<String, Object> config = getConsumerConfig("group_job_application");
 
         JsonDeserializer<JobApplication> jobApplicationJsonDeserializer = new JsonDeserializer<>(JobApplication.class, false);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), jobApplicationJsonDeserializer);
@@ -40,6 +36,22 @@ public class KafkaConfiguration {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
+
+    @Bean
+    public ConsumerFactory<String, JobOfferPayment> paymentConsumerFactory() {
+        Map<String, Object> config = getConsumerConfig("group_payment_employer");
+
+        JsonDeserializer<JobOfferPayment> jobApplicationJsonDeserializer = new JsonDeserializer<>(JobOfferPayment.class, false);
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), jobApplicationJsonDeserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, JobOfferPayment> jobOfferPaymentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, JobOfferPayment> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(paymentConsumerFactory());
+        return factory;
+    }
+
 
     @Bean
     public ProducerFactory<String, JobOffer> jobOfferProducerFactory() {
@@ -71,6 +83,18 @@ public class KafkaConfiguration {
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return config;
+    }
+
+    private Map<String, Object> getConsumerConfig(String groupId) {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+
         return config;
     }
 }
