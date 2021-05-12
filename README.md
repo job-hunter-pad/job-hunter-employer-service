@@ -525,7 +525,9 @@ the id `jobId`
 
 #### Request
 
-PathVariable: jobId PathVariable: applicationId
+PathVariable: jobId
+
+PathVariable: applicationId
 
 #### Response
 
@@ -554,7 +556,7 @@ public enum JobApplicationStatus {
 }
 ```
 
-### %TITLE%
+### Reject Application
 
 | URL | API Gateway URL | Method |
 | ------ | ------ | ------ |
@@ -567,7 +569,9 @@ the id `jobId`
 
 #### Request
 
-PathVariable: jobId PathVariable: applicationId
+PathVariable: jobId
+
+PathVariable: applicationId
 
 #### Response
 
@@ -610,9 +614,7 @@ to `COMPLETED`.
 
 #### Request
 
-PathVariable:
-
-RequestParam:
+PathVariable: jobId
 
 #### Response
 
