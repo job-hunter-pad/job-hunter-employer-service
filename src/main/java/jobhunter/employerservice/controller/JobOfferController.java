@@ -1,7 +1,10 @@
 package jobhunter.employerservice.controller;
 
+import jobhunter.employerservice.controller.authorization.AuthTokenValidator;
 import jobhunter.employerservice.controller.dto.CreateJobOfferDTO;
 import jobhunter.employerservice.controller.dto.UpdateJobOfferDTO;
+import jobhunter.employerservice.interceptor.AuthTokenHTTPInterceptor;
+import jobhunter.employerservice.interceptor.BearerExtractor;
 import jobhunter.employerservice.kafka.producer.JobApplicationsProducer;
 import jobhunter.employerservice.kafka.producer.JobOfferProducer;
 import jobhunter.employerservice.model.JobApplication;
@@ -11,7 +14,6 @@ import jobhunter.employerservice.model.JobOfferStatus;
 import jobhunter.employerservice.repository.JobOfferRepository;
 import jobhunter.employerservice.service.JobApplicationNotCompletedException;
 import jobhunter.employerservice.service.JobOfferService;
-import jobhunter.employerservice.utils.StringValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,13 +29,21 @@ public class JobOfferController {
     private final JobOfferProducer jobOfferProducer;
     private final JobApplicationsProducer jobApplicationsProducer;
 
+    private final AuthTokenValidator authTokenValidator;
+    private final BearerExtractor bearerExtractor;
+
     public JobOfferController(JobOfferRepository jobOfferRepository,
-                              JobOfferService jobOfferService, JobOfferProducer jobOfferProducer,
-                              JobApplicationsProducer jobApplicationsProducer) {
+                              JobOfferService jobOfferService,
+                              JobOfferProducer jobOfferProducer,
+                              JobApplicationsProducer jobApplicationsProducer,
+                              AuthTokenValidator authTokenValidator,
+                              BearerExtractor bearerExtractor) {
         this.jobOfferRepository = jobOfferRepository;
         this.jobOfferService = jobOfferService;
         this.jobOfferProducer = jobOfferProducer;
         this.jobApplicationsProducer = jobApplicationsProducer;
+        this.authTokenValidator = authTokenValidator;
+        this.bearerExtractor = bearerExtractor;
     }
 
     @GetMapping("/")
@@ -64,10 +74,15 @@ public class JobOfferController {
     }
 
     @PostMapping("/create")
-    public JobOffer createJob(@RequestBody CreateJobOfferDTO jobOfferDTO) {
+    public JobOffer createJob(@RequestBody CreateJobOfferDTO jobOfferDTO, @RequestHeader(AuthTokenHTTPInterceptor.AUTHORIZATION_HEADER) String header) {
         if (jobOfferDTO == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+
+        if (!authTokenValidator.authorize(jobOfferDTO.getEmployerId(), bearerExtractor.extract(header))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
         JobOffer jobOffer = jobOfferService.createJob(jobOfferDTO);
 
         jobOfferProducer.postJobOffer(jobOffer);
@@ -76,21 +91,27 @@ public class JobOfferController {
     }
 
     @PostMapping("/update")
-    public JobOffer updateJob(@RequestBody UpdateJobOfferDTO jobOfferDTO) {
-        if (jobOfferDTO == null || StringValidation.IsStringEmpty(jobOfferDTO.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    public JobOffer updateJob(@RequestBody UpdateJobOfferDTO jobOfferDTO, @RequestHeader(AuthTokenHTTPInterceptor.AUTHORIZATION_HEADER) String header) {
+
+        Optional<JobOffer> optional = jobOfferService.getJobOffer(jobOfferDTO.getId());
+
+        if (optional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
+        if (!authTokenValidator.authorize(optional.get().getEmployerId(), bearerExtractor.extract(header))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
 
         Optional<JobOffer> jobOfferOptional = jobOfferService.updateJobOffer(jobOfferDTO);
         if (jobOfferOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        JobOffer jobOffer1 = jobOfferOptional.get();
-        jobOfferProducer.postJobOffer(jobOffer1);
+        JobOffer jobOffer = jobOfferOptional.get();
+        jobOfferProducer.postJobOffer(jobOffer);
 
-        return jobOffer1;
+        return jobOffer;
     }
 
     @GetMapping("/getJobApplications/{jobId}")
@@ -103,8 +124,12 @@ public class JobOfferController {
     }
 
     @PostMapping("/acceptApplication/{jobId}/{applicationId}")
-    public JobApplication acceptApplication(@PathVariable String jobId, @PathVariable String applicationId) {
+    public JobApplication acceptApplication(@PathVariable String jobId, @PathVariable String applicationId, @RequestHeader(AuthTokenHTTPInterceptor.AUTHORIZATION_HEADER) String header) {
         JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!authTokenValidator.authorize(jobOffer.getEmployerId(), bearerExtractor.extract(header))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
 
         Optional<JobApplication> jobApplicationOptional = jobOffer.getApplications()
                 .stream()
@@ -138,8 +163,13 @@ public class JobOfferController {
     }
 
     @PostMapping("/rejectApplication/{jobId}/{applicationId}")
-    public JobApplication rejectApplication(@PathVariable String jobId, @PathVariable String applicationId) {
+    public JobApplication rejectApplication(@PathVariable String jobId, @PathVariable String applicationId, @RequestHeader(AuthTokenHTTPInterceptor.AUTHORIZATION_HEADER) String header) {
         JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!authTokenValidator.authorize(jobOffer.getEmployerId(), bearerExtractor.extract(header))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<JobApplication> jobApplicationOptional = jobOffer.getApplications()
                 .stream()
                 .filter(application -> application.getId().equals(applicationId))
@@ -160,7 +190,16 @@ public class JobOfferController {
     }
 
     @PostMapping("/completeJob/{jobId}")
-    public JobOffer updateJob(@PathVariable String jobId) {
+    public JobOffer updateJob(@PathVariable String jobId, @RequestHeader(AuthTokenHTTPInterceptor.AUTHORIZATION_HEADER) String header) {
+        Optional<JobOffer> optional = jobOfferService.getJobOffer(jobId);
+        if (optional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!authTokenValidator.authorize(optional.get().getEmployerId(), bearerExtractor.extract(header))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<JobOffer> jobOfferOptional;
         try {
             jobOfferOptional = jobOfferService.completeJob(jobId);

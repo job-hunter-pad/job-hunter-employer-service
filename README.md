@@ -1,5 +1,18 @@
 # Job Hunter Employer Service
 
+## Environment Variables
+
+- AUTH_URL
+
+Example:
+> AUTH_URL=http://localhost:8090/api/auth
+
+`AUTH_URL` indicates the url to the Authentication Service
+
+This Environment Variable is used to access the Authentication Service in order authorize certain requests
+
+## Endpoints
+
 ### Get All Job Offers
 
 | URL | API Gateway URL | Method |
@@ -327,6 +340,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /create | /api/jobs/create | POST |  
 
+#### Notes
+
+> Requires Authorization Header with JWT 
+
 #### Request
 
 RequestParam: CreateJobOfferDTO
@@ -340,7 +357,7 @@ CreateJobOfferDTO
   "date": "",
   "employerId": "",
   "employerName": "",
-  "hourSalaryAmount": "",
+  "hourSalaryAmount": 0.0,
   "skills": []
 }
 ```
@@ -402,6 +419,9 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /update | /api/jobs/update | POST |
 
+#### Notes
+
+> Requires Authorization Header with JWT
 #### Request
 
 RequestParam: UpdateJobOfferDTO
@@ -413,7 +433,7 @@ UpdateJobOfferDTO
   "id": "",
   "jobName": "",
   "jobDescription": "",
-  "hourSalaryAmount": "",
+  "hourSalaryAmount": 0.0,
   "skills": []
 }
 ```
@@ -518,6 +538,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /acceptApplication/{jobId}/{applicationId} | /api/jobs/acceptApplication/{jobId}/{applicationId} | POST |
 
+#### Notes
+
+> Requires Authorization Header with JWT
+
 #### Description
 
 Application Status Will be changed to `ACCEPTED` for the Application with the id `applicationId` for the Job Offer with
@@ -562,6 +586,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /rejectApplication/{jobId}/{applicationId} | /api/jobs/rejectApplication/{jobId}/{applicationId} | POST | 
 
+#### Notes
+
+> Requires Authorization Header with JWT
+
 #### Description
 
 Application Status Will be changed to `REJECTED` for the Application with the id `applicationId` for the Job Offer with
@@ -605,6 +633,10 @@ public enum JobApplicationStatus {
 | URL | API Gateway URL | Method |
 | ------ | ------ | ------ |
 | /completeJob/{jobId} | /api/jobs/completeJob/{jobId} | POST |
+
+#### Notes
+
+> Requires Authorization Header with JWT
 
 #### Description
 
