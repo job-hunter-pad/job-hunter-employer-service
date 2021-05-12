@@ -1,5 +1,18 @@
 # Job Hunter Employer Service
 
+## Environment Variables
+
+- AUTH_VERIFICATION_URL
+
+Example:
+> AUTH_VERIFICATION_URL=http://localhost:8090/api/auth/validateId
+
+`AUTH_VERIFICATION_URL` indicates the url to the Authentication Service
+
+This Environment Variable is used to access the Authentication Service in order authorize certain requests
+
+## Endpoints
+
 ### Get All Job Offers
 
 | URL | API Gateway URL | Method |
@@ -327,6 +340,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /create | /api/jobs/create | POST |  
 
+#### Notes
+
+> Requires Authorization Header with JWT
+
 #### Request
 
 RequestParam: CreateJobOfferDTO
@@ -340,7 +357,7 @@ CreateJobOfferDTO
   "date": "",
   "employerId": "",
   "employerName": "",
-  "hourSalaryAmount": "",
+  "hourSalaryAmount": 0.0,
   "skills": []
 }
 ```
@@ -402,6 +419,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /update | /api/jobs/update | POST |
 
+#### Notes
+
+> Requires Authorization Header with JWT
+
 #### Request
 
 RequestParam: UpdateJobOfferDTO
@@ -413,7 +434,7 @@ UpdateJobOfferDTO
   "id": "",
   "jobName": "",
   "jobDescription": "",
-  "hourSalaryAmount": "",
+  "hourSalaryAmount": 0.0,
   "skills": []
 }
 ```
@@ -518,6 +539,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /acceptApplication/{jobId}/{applicationId} | /api/jobs/acceptApplication/{jobId}/{applicationId} | POST |
 
+#### Notes
+
+> Requires Authorization Header with JWT
+
 #### Description
 
 Application Status Will be changed to `ACCEPTED` for the Application with the id `applicationId` for the Job Offer with
@@ -525,7 +550,9 @@ the id `jobId`
 
 #### Request
 
-PathVariable: jobId PathVariable: applicationId
+PathVariable: jobId
+
+PathVariable: applicationId
 
 #### Response
 
@@ -554,11 +581,15 @@ public enum JobApplicationStatus {
 }
 ```
 
-### %TITLE%
+### Reject Application
 
 | URL | API Gateway URL | Method |
 | ------ | ------ | ------ |
 | /rejectApplication/{jobId}/{applicationId} | /api/jobs/rejectApplication/{jobId}/{applicationId} | POST | 
+
+#### Notes
+
+> Requires Authorization Header with JWT
 
 #### Description
 
@@ -567,7 +598,9 @@ the id `jobId`
 
 #### Request
 
-PathVariable: jobId PathVariable: applicationId
+PathVariable: jobId
+
+PathVariable: applicationId
 
 #### Response
 
@@ -602,6 +635,10 @@ public enum JobApplicationStatus {
 | ------ | ------ | ------ |
 | /completeJob/{jobId} | /api/jobs/completeJob/{jobId} | POST |
 
+#### Notes
+
+> Requires Authorization Header with JWT
+
 #### Description
 
 Used to mark a job as completed. This will result in changing the status of the Job Offer with the id of `jobId`
@@ -610,9 +647,7 @@ to `COMPLETED`.
 
 #### Request
 
-PathVariable:
-
-RequestParam:
+PathVariable: jobId
 
 #### Response
 
