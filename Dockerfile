@@ -1,8 +1,8 @@
 FROM openjdk:15-jdk-alpine
 
-ARG AUTH_SERVICE_URL=http://localhost:8090/api/auth
+ARG VERIF_URL=http://apigateway/api/auth/validateId
 
-ENV AUTH_URL=$AUTH_SERVICE_URL
+ENV AUTH_VERIFICATION_URL=$VERIF_URL
 
 ARG JAR_FILE=target/*.jar
 

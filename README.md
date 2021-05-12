@@ -2,12 +2,12 @@
 
 ## Environment Variables
 
-- AUTH_URL
+- AUTH_VERIFICATION_URL
 
 Example:
-> AUTH_URL=http://localhost:8090/api/auth
+> AUTH_VERIFICATION_URL=http://localhost:8090/api/auth/validateId
 
-`AUTH_URL` indicates the url to the Authentication Service
+`AUTH_VERIFICATION_URL` indicates the url to the Authentication Service
 
 This Environment Variable is used to access the Authentication Service in order authorize certain requests
 
@@ -342,7 +342,7 @@ public enum JobApplicationStatus {
 
 #### Notes
 
-> Requires Authorization Header with JWT 
+> Requires Authorization Header with JWT
 
 #### Request
 
@@ -422,6 +422,7 @@ public enum JobApplicationStatus {
 #### Notes
 
 > Requires Authorization Header with JWT
+
 #### Request
 
 RequestParam: UpdateJobOfferDTO
