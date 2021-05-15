@@ -30,7 +30,22 @@ public class JobOfferServiceImpl implements JobOfferService {
         }
 
         JobOffer jobOffer = jobOfferOptional.get();
-        jobOffer.getApplications().add(jobApplication);
+
+        List<JobApplication> applications = jobOffer.getApplications();
+        Optional<JobApplication> existingJobApplicationOptional = applications.stream().filter(application -> application.getId().equals(jobApplication.getJobId())).findFirst();
+
+        if (existingJobApplicationOptional.isPresent()) {
+            JobApplication existingJobApplication = existingJobApplicationOptional.get();
+            if (existingJobApplication.getStatus().equals(JobApplicationStatus.ACCEPTED)) {
+                return;
+            } else if (existingJobApplication.getStatus().equals(JobApplicationStatus.PENDING) && jobApplication.getStatus().equals(JobApplicationStatus.ACCEPTED)) {
+                existingJobApplication.setStatus(JobApplicationStatus.ACCEPTED);
+                jobOfferRepository.save(jobOffer);
+                return;
+            }
+        }
+
+        applications.add(jobApplication);
         jobOfferRepository.save(jobOffer);
     }
 
